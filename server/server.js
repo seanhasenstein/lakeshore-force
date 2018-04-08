@@ -16,33 +16,37 @@ const app = express();
 mongoose.Promise = global.Promise;
 
 // Connect to MongoDB isntance and log a mess on success or failure
-mongoose.connect(process.env.MONGODB_URI).then(
-	() => console.log('Connected to MongoLab instance.'),
-	err => console.log('Error connecting to MongoLab.')
-);
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => console.log('Connected to MongoLab instance.'), err => console.log('Error connecting to MongoLab.'));
 
 // Configures express to use sessions
-app.use(session({
-	resave: true,
-	saveUninitialized: true,
-	secret: 'oafaw23rlajf',
-	store: new MongoStore({
-		url: process.env.MONGODB_URI,
-		autoReconnect: true
-	})
-}));
+app.use(
+  session({
+    resave: true,
+    saveUninitialized: true,
+    secret: 'oafaw23rlajf',
+    store: new MongoStore({
+      url: process.env.MONGODB_URI,
+      autoReconnect: true,
+    }),
+  })
+);
 
 // Passport is wired into express as a middleware. When a request comes in,
 // Passport will examine the request's session (as set by the above config) and
-// assign the current user to the 'req.user' object.  See also servces/auth.js
+// assign the current user to the 'req.user' object.  See also middleware/auth.js
 app.use(passport.initialize());
 app.use(passport.session());
 
 // Tell Express to pass on any request made to the '/graphql' route to the GraphQL instance
-app.use('/graphql', expressGraphQL({
-	schema,
-	graphiql: true
-}));
+app.use(
+  '/graphql',
+  expressGraphQL({
+    schema,
+    graphiql: true,
+  })
+);
 
 // const webpackMiddleware = require('webpack-dev-middleware');
 // const webpack = require('webpack');
